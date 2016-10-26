@@ -39,21 +39,22 @@ RUN adduser --gecos '' --disabled-password --disabled-login hacker && \
 USER hacker
 WORKDIR /home/hacker
 
-RUN wget -q -O qemu-plugins-next-master.zip https://github.com/guillon/qemu-plugins/archive/next/master.zip && \
-    unzip qemu-plugins-next-master.zip && \
-    rm -f qemu-plugins-next-master.zip
+RUN wget -q -O qemu-plugins-v2.6.0-2.zip https://github.com/guillon/qemu-plugins/archive/v2.6.0-2.zip && \
+    unzip qemu-plugins-v2.6.0-2.zip && \
+    rm -f qemu-plugins-v2.6.0-2.zip && \
+    mv qemu-plugins-2.6.0-2 qemu-plugins-build
 
-RUN cd qemu-plugins-next-master && \
+RUN cd qemu-plugins-build && \
     ./configure --disable-werror --enable-capstone --enable-tcg-plugin \
     --target-list=x86_64-linux-user,arm-linux-user,aarch64-linux-user,arm-softmmu --prefix=$PWD/devimage
 
-RUN cd qemu-plugins-next-master && \
+RUN cd qemu-plugins-build && \
     make -j4 && \
     make install
 
 VOLUME /home/hacker
 
-ENV PATH=/home/hacker/qemu-plugins-next-master/devimage/bin:/home/hacker/qemu-tutorial/scripts:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/home/hacker/qemu-plugins-build/devimage/bin:/home/hacker/qemu-tutorial/scripts:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 COPY qemu-tutorial/ /qemu-tutorial
 COPY entrypoint.sh /
